@@ -62,15 +62,15 @@ instances:
   low_resolution: 1.0
 - method: mpeg
   low_qp:
-  - 36
-  - 26
-  low_resolution: 0.8
+  - 34
+  - 24
+  low_resolution: 1.0
 - batch_size: 15
   # the configuration for the Stream A (low) and Stream B (high)
-  high_qp: 26
-  high_resolution: 0.8
-  low_qp: 36
-  low_resolution: 0.8
+  high_qp: 24
+  high_resolution: 1.0
+  low_qp: 34
+  low_resolution: 1.0
   method: dds
   # Two regions will be treated as the same region if the intersection-over-union (IoU) is larger than this threshold
   objfilter_iou: 0.3
