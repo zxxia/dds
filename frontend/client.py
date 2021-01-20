@@ -31,7 +31,7 @@ class Client:
 
     def analyze_video_mpeg(self, video_name, raw_images_path, enforce_iframes):
         number_of_frames = len(
-            [f for f in os.listdir(raw_images_path) if ".png" in f])
+            [f for f in os.listdir(raw_images_path) if ".jpg" in f])
 
         final_results = Results()
         final_rpn_results = Results()
@@ -40,7 +40,7 @@ class Client:
             start_frame = i
             end_frame = min(number_of_frames, i + self.config.batch_size)
 
-            batch_fnames = sorted([f"{str(idx).zfill(10)}.png"
+            batch_fnames = sorted([f"{str(idx).zfill(6)}.jpg"
                                    for idx in range(start_frame, end_frame)])
 
             req_regions = Results()
@@ -70,7 +70,7 @@ class Client:
                 rpn_results, self.config.intersection_threshold)
 
             # Remove encoded video manually
-            shutil.rmtree(f"{video_name}-base-phase-cropped")
+            # shutil.rmtree(f"{video_name}-base-phase-cropped")
             total_size += batch_video_size
 
         final_results = merge_boxes_in_results(
@@ -93,7 +93,7 @@ class Client:
         high_phase_results = Results()
 
         number_of_frames = len(
-            [x for x in os.listdir(high_images_path) if "png" in x])
+            [x for x in os.listdir(high_images_path) if "jpg" in x])
 
         low_results_dict = None
         if low_results_path:
@@ -231,7 +231,7 @@ class Client:
         all_required_regions = Results()
         low_phase_size = 0
         high_phase_size = 0
-        nframes = sum(map(lambda e: "png" in e, os.listdir(raw_images)))
+        nframes = sum(map(lambda e: "jpg" in e, os.listdir(raw_images)))
 
         self.init_server(nframes)
 

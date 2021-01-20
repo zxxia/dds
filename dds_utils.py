@@ -503,7 +503,7 @@ def compress_and_get_size(images_path, start_id, end_id, qp,
             encoding_result = subprocess.run(["ffmpeg", "-y",
                                               "-loglevel", "error",
                                               "-start_number", str(start_id),
-                                              '-i', f"{images_path}/%010d.png",
+                                              '-i', f"{images_path}/%06d.jpg",
                                               "-vcodec", "libx264", "-g", "15",
                                               "-keyint_min", "15",
                                               "-pix_fmt", "yuv420p",
@@ -518,7 +518,7 @@ def compress_and_get_size(images_path, start_id, end_id, qp,
             encoding_result = subprocess.run(["ffmpeg", "-y",
                                               "-loglevel", "error",
                                               "-start_number", str(start_id),
-                                              '-i', f"{images_path}/%010d.png",
+                                              '-i', f"{images_path}/%06d.jpg",
                                               "-vcodec", "libx264",
                                               "-g", "15",
                                               "-keyint_min", "15",
@@ -534,7 +534,7 @@ def compress_and_get_size(images_path, start_id, end_id, qp,
     else:
         encoding_result = subprocess.run(["ffmpeg", "-y",
                                           "-start_number", str(start_id),
-                                          "-i", f"{images_path}/%010d.png",
+                                          "-i", f"{images_path}/%06d.jpg",
                                           "-loglevel", "error",
                                           "-vcodec", "libx264",
                                           "-pix_fmt", "yuv420p", "-crf", "23",
@@ -561,12 +561,12 @@ def extract_images_from_video(images_path, req_regions):
         return
 
     for fname in os.listdir(images_path):
-        if "png" not in fname:
+        if "jpg" not in fname:
             continue
         else:
             os.remove(os.path.join(images_path, fname))
     encoded_vid_path = os.path.join(images_path, "temp.mp4")
-    extacted_images_path = os.path.join(images_path, "%010d.png")
+    extacted_images_path = os.path.join(images_path, "%06d.jpg")
     decoding_result = subprocess.run(["ffmpeg", "-y",
                                       "-i", encoded_vid_path,
                                       "-pix_fmt", "yuvj420p",
@@ -584,7 +584,7 @@ def extract_images_from_video(images_path, req_regions):
 
     fnames = sorted(
         [os.path.join(images_path, name)
-         for name in os.listdir(images_path) if "png" in name])
+         for name in os.listdir(images_path) if "jpg" in name])
     fids = sorted(list(set([r.fid for r in req_regions.regions])))
     fids_mapping = zip(fids, fnames)
     for fname in fnames:
@@ -593,7 +593,7 @@ def extract_images_from_video(images_path, req_regions):
 
     for fid, fname in fids_mapping:
         os.rename(os.path.join(f"{fname}_temp"),
-                  os.path.join(images_path, f"{str(fid).zfill(10)}.png"))
+                  os.path.join(images_path, f"{str(fid).zfill(6)}.jpg"))
 
 
 def crop_images(results, vid_name, images_direc, resolution=None):
@@ -604,7 +604,7 @@ def crop_images(results, vid_name, images_direc, resolution=None):
         if not (cached_image and
                 cached_image[0] == region.fid):
             image_path = os.path.join(images_direc,
-                                      f"{str(region.fid).zfill(10)}.png")
+                                      f"{str(region.fid).zfill(6)}.jpg")
             cached_image = (region.fid, cv.imread(image_path))
 
         # Just move the complete image
@@ -636,7 +636,7 @@ def crop_images(results, vid_name, images_direc, resolution=None):
             im_to_write = cv.resize(frame, (w, h), fx=0, fy=0,
                                     interpolation=cv.INTER_CUBIC)
             frame = im_to_write
-        cv.imwrite(os.path.join(vid_name, f"{str(idx).zfill(10)}.png"), frame,
+        cv.imwrite(os.path.join(vid_name, f"{str(idx).zfill(6)}.jpg"), frame,
                    [cv.IMWRITE_PNG_COMPRESSION, 0])
 
     return frames_count
@@ -645,7 +645,7 @@ def crop_images(results, vid_name, images_direc, resolution=None):
 def merge_images(cropped_images_direc, low_images_direc, req_regions):
     images = {}
     for fname in os.listdir(cropped_images_direc):
-        if "png" not in fname:
+        if "jpg" not in fname:
             continue
         fid = int(fname.split(".")[0])
 
@@ -720,7 +720,7 @@ def get_size_from_mpeg_results(results_log_path, images_path, resolution):
         lines = f.readlines()
     lines = [line for line in lines if line.rstrip().lstrip() != ""]
 
-    num_frames = len([x for x in os.listdir(images_path) if "png" in x])
+    num_frames = len([x for x in os.listdir(images_path) if "jpg" in x])
 
     bandwidth = 0
     for idx, line in enumerate(lines):
@@ -884,7 +884,7 @@ def visualize_regions(results, images_direc,
     fids = sorted(list(set([r.fid for r in results.regions])))
     while idx < len(fids):
         image_np = cv.imread(
-            os.path.join(images_direc, f"{str(fids[idx]).zfill(10)}.png"))
+            os.path.join(images_direc, f"{str(fids[idx]).zfill(6)}.jpg"))
         width = image_np.shape[1]
         height = image_np.shape[0]
         regions = [r for r in results.regions if r.fid == fids[idx]]
@@ -910,7 +910,7 @@ def visualize_regions(results, images_direc,
 
 
 def visualize_single_regions(region, images_direc, label="debugging"):
-    image_path = os.path.join(images_direc, f"{str(region.fid).zfill(10)}.png")
+    image_path = os.path.join(images_direc, f"{str(region.fid).zfill(6)}.jpg")
     image_np = cv.imread(image_path)
     width = image_np.shape[1]
     height = image_np.shape[0]

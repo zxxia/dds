@@ -77,7 +77,7 @@ def main(args):
     f1 = 0
     stats = (0, 0, 0)
     number_of_frames = len(
-        [x for x in os.listdir(args.high_images_path) if "png" in x])
+        [x for x in os.listdir(args.high_images_path) if "jpg" in x])
     # if args.ground_truth:
     #     ground_truth_dict = read_results_dict(args.ground_truth)
     #     logger.info("Reading ground truth results complete")
@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
     if args.method != "dds":
         assert args.high_resolution == -1, "Only dds support two quality levels"
-            
+
 
     if args.high_resolution == -1:
         print("Only one resolution given, running MPEG emulation")
@@ -137,7 +137,7 @@ if __name__ == "__main__":
         assert args.low_resolution <= args.high_resolution, \
                 f"The resolution of low quality({args.low_resolution})"\
                 f"can't be larger than high quality({args.high_resolution})"
-        assert not(args.low_resolution == args.high_resolution and 
+        assert not(args.low_resolution == args.high_resolution and
                     args.low_qp < args.high_qp),\
                 f"Under the same resolution, the QP of low quality({args.low_qp})"\
                 f"can't be higher than the QP of high quality({args.high_qp})"

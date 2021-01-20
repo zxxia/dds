@@ -52,7 +52,7 @@ class Server:
             fnames = sorted(os.listdir(images_direc))
         self.logger.info(f"Running inference on {len(fnames)} frames")
         for fname in fnames:
-            if "png" not in fname:
+            if "jpg" not in fname:
                 continue
             fid = int(fname.split(".")[0])
             image = None
@@ -61,7 +61,11 @@ class Server:
             else:
                 image_path = os.path.join(images_direc, fname)
                 image = cv.imread(image_path)
-            image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+            try:
+                image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+            except:
+                import ipdb
+                ipdb.set_trace()
 
             detection_results, rpn_results = (
                 self.detector.infer(image))
@@ -167,7 +171,7 @@ class Server:
                               "second iteration was called anyway")
             return Results()
 
-        fnames = sorted([f for f in os.listdir(images_direc) if "png" in f])
+        fnames = sorted([f for f in os.listdir(images_direc) if "jpg" in f])
 
         # Make seperate directory and copy all images to that directory
         merged_images_direc = os.path.join(images_direc, "merged")
@@ -224,7 +228,7 @@ class Server:
             req_regions.append(
                 Region(fid, 0, 0, 1, 1, 1.0, 2, self.config.low_resolution))
         extract_images_from_video("server_temp", req_regions)
-        fnames = [f for f in os.listdir("server_temp") if "png" in f]
+        fnames = [f for f in os.listdir("server_temp") if "jpg" in f]
 
         results, rpn = self.perform_detection(
             "server_temp", self.config.low_resolution, fnames)

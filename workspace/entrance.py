@@ -12,13 +12,13 @@ import sys
 # dirty fix
 sys.path.append('../')
 
-def load_configuration():
+def load_configuration(video_name):
     """read configuration information from yaml file
 
     Returns:
         dict: information of the yaml file
     """
-    with open('configuration.yml', 'r') as config:
+    with open(f'configuration_{video_name}.yml', 'r') as config:
         config_info = yaml.load(config, Loader=yaml.FullLoader)
     return config_info
 
@@ -39,7 +39,7 @@ def execute_single(single_instance):
     if baseline == 'gt':
         # unpacking
         video_name = single_instance['video_name']
-        original_images_dir = os.path.join(data_dir, video_name, 'src')
+        original_images_dir = os.path.join(data_dir, video_name, '720p')
 
         # skip if result file already exists
         result_file_name = f"{video_name}_gt"
@@ -51,7 +51,7 @@ def execute_single(single_instance):
             single_instance['high_images_path'] = f'{original_images_dir}'
             single_instance['outfile'] = 'stats'
 
-            subprocess.run(['python', '../play_video.py', 
+            subprocess.run(['python', '../play_video.py',
                             yaml.dump(single_instance)])
 
     # assume we are running emulation
@@ -60,7 +60,7 @@ def execute_single(single_instance):
         video_name = single_instance['video_name']
         mpeg_qp = single_instance['low_qp']
         mpeg_resolution = single_instance['low_resolution']
-        original_images_dir = os.path.join(data_dir, video_name, 'src')
+        original_images_dir = os.path.join(data_dir, video_name, '720p')
 
         # skip if result file already exists
         result_file_name = f"{video_name}_mpeg_{mpeg_resolution}_{mpeg_qp}"
@@ -78,7 +78,7 @@ def execute_single(single_instance):
     elif baseline == 'dds':
         # unpacking
         video_name = single_instance['video_name']
-        original_images_dir = os.path.join(data_dir, video_name, 'src')
+        original_images_dir = os.path.join(data_dir, video_name, '720p')
         low_qp = single_instance['low_qp']
         high_qp = single_instance['high_qp']
         low_res = single_instance['low_resolution']
@@ -106,10 +106,10 @@ def execute_single(single_instance):
             if single_instance["mode"] == 'implementation':
                 assert single_instance['hname'] != False, "Must provide the server address for implementation, abort."
                 # single_instance['hname'] = '127.0.0.1:5000'
-                
+
             subprocess.run(['python', '../play_video.py',
                                 yaml.dump(single_instance)])
-    
+
 
 def parameter_sweeping(instances, new_instance, keys):
     """recursive function for parameter sweeping
@@ -123,7 +123,7 @@ def parameter_sweeping(instances, new_instance, keys):
         execute_single(new_instance)
     else: # recursive step
         curr_key = keys[0]
-        if (isinstance(instances[curr_key], list)): 
+        if (isinstance(instances[curr_key], list)):
             # need parameter sweeping
             for each_parameter in instances[curr_key]:
                 # replace the list with a single value
@@ -158,7 +158,8 @@ def execute_all(config_info):
 
 if __name__ == "__main__":
     # load configuration information (only once)
-    config_info = load_configuration()
+    video_name = sys.argv[1]
+    config_info = load_configuration(video_name)
     data_dir = config_info['data_dir']
-    
+
     execute_all(config_info)
